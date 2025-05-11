@@ -1,0 +1,131 @@
+{% extends 'innerbase.html' %}
+
+{% block main %}
+
+<div class="container mt-4">
+    <h1>Survey Designer</h1>
+    <form method="POST" onsubmit="prepareSurveyData()">
+        
+        <div class="mb-3">
+            <label for="title" class="form-label">Survey Title:</label>
+            <input type="text" name="title" class="form-control" required>
+        </div>
+
+        <div id="questions-container"></div>
+
+        <button type="button" class="btn btn-secondary mb-3" onclick="addQuestion()">Add Question</button>
+        <input type="hidden" name="survey_json" id="survey_json">
+        <br><br>
+        <button type="submit" class="btn btn-primary">Save Survey</button>
+    </form>
+</div>
+
+<template id="question-template">
+    <div class="question-block">
+        <label>Question Text:
+            <input type="text" class="form-control q-text" required>
+        </label>
+
+        <label>Type:
+            <select class="form-select q-type" onchange="handleTypeChange(this)">
+                <option value="multiple_choice">Multiple Choice</option>
+                <option value="checkbox">Checkboxes</option>
+                <option value="dropdown">Dropdown</option>
+                <option value="rating">Rating (1-5)</option>
+                <option value="text">Open Text</option>
+            </select>
+        </label>
+
+        <div class="q-options">
+            <label>Options (comma-separated):
+                <input type="text" class="form-control q-options-input">
+            </label>
+        </div>
+
+        <label>
+            <input type="checkbox" class="q-required"> Required
+        </label>
+
+        <div class="q-conditional">
+            <label>Conditional Logic (optional):</label>
+            Show this question if question ID:
+            <input type="text" class="form-control cond-qid" placeholder="e.g., q1">
+            has value:
+            <input type="text" class="form-control cond-val" placeholder="e.g., Yes">
+        </div>
+
+        <button type="button" class="btn btn-danger mt-2" onclick="removeQuestion(this)">Remove</button>
+    </div>
+</template>
+
+<script>
+    let questionCount = 0;
+
+    function addQuestion() {
+        const container = document.getElementById('questions-container');
+        const template = document.getElementById('question-template').content.cloneNode(true);
+        const block = template.querySelector('.question-block');
+
+        block.dataset.qid = `Q${questionCount}`;
+        block.insertAdjacentHTML('afterbegin', `<strong>Question ID: q${questionCount}</strong>`);
+        questionCount++;
+
+        container.appendChild(template);
+    }
+
+    function removeQuestion(btn) {
+        btn.closest('.question-block').remove();
+    }
+
+    function handleTypeChange(select) {
+        const block = select.closest('.question-block');
+        const optionsDiv = block.querySelector('.q-options');
+        const type = select.value;
+        if (['multiple_choice', 'checkbox', 'dropdown'].includes(type)) {
+            optionsDiv.style.display = 'block';
+        } else {
+            optionsDiv.style.display = 'none';
+        }
+    }
+
+    function prepareSurveyData() {
+        const survey = [];
+        const blocks = document.querySelectorAll('.question-block');
+
+        blocks.forEach(block => {
+            const qid = block.dataset.qid;
+            const text = block.querySelector('.q-text').value;
+            const type = block.querySelector('.q-type').value;
+            const required = block.querySelector('.q-required').checked;
+            const optionsInput = block.querySelector('.q-options-input');
+            const condQid = block.querySelector('.cond-qid').value;
+            const condVal = block.querySelector('.cond-val').value;
+
+            const question = {
+                id: qid,
+                question: text,
+                type: type,
+                required: required
+            };
+
+            if (['multiple_choice', 'checkbox', 'dropdown'].includes(type)) {
+                question.options = optionsInput.value.split(',').map(opt => opt.trim()).filter(opt => opt);
+            }
+
+            if (condQid && condVal) {
+                question.conditional = {
+                    show_if: {
+                        question_id: condQid,
+                        value: condVal
+                    }
+                };
+            }
+
+            survey.push(question);
+        });
+
+        document.getElementById('survey_json').value = JSON.stringify(survey);
+    }
+</script>
+    
+{% endblock %}

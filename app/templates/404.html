@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			body {
+				display: flex;
+				flex-direction: row;
+				padding: 10px;
+				margin: 0 auto;
+                justify-content: center;
+                align-items: center;
+				height: 100vh;
+				width: 100vw;
+				background-color: #f1f1f1;
+			}
+		</style>
+		<title>CS458</title>
+        <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/404.css') }}"
+        />
+        <link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
+			crossorigin="anonymous"
+		/>
+        <link href='https://fonts.googleapis.com/css?family=Anton|Passion+One|PT+Sans+Caption' rel='stylesheet' type='text/css'>
+	</head>
+    <body>
+        <!-- Error Page -->
+        <div class="error">
+            <div class="container-floud">
+                <div class="col-xs-12 ground-color text-center">
+                    <div class="container-error-404">
+                        <div class="clip"><div class="shadow"><span class="digit thirdDigit"></span></div></div>
+                        <div class="clip"><div class="shadow"><span class="digit secondDigit"></span></div></div>
+                        <div class="clip"><div class="shadow"><span class="digit firstDigit"></span></div></div>
+                        <div class="msg">OH!<span class="triangle"></span></div>
+                    </div>
+                    <h2 class="h1">Sorry! Page not found</h2>
+                    <form action="{{ url_for('auth.login') }}" method="get">
+                        <button type="submit" class="btn btn-secondary">Go Back</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- Error Page -->
+        <script
+        src="{{ url_for('static', filename='js/404.js') }}"
+        ></script>
+		<script
+			src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+			integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+			crossorigin="anonymous"
+		></script>
+    </body>
+</html>

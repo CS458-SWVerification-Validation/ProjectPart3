@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			body {
+				display: flex;
+				flex-direction: column;
+				padding: 10px;
+				margin: 0 auto;
+				height: 100vh;
+				width: 98.9vw;
+				background-color: #f1f1f1;
+			}
+		</style>
+		<title>CS458</title>
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
+			crossorigin="anonymous"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css"
+		/>
+		<script
+			src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+			integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+			crossorigin="anonymous"
+		></script>
+	</head>
+	<body>
+		<nav class="navbar navbar-expand-lg bg-body-tertiary">
+			<div class="container-fluid" style="justify-content: space-between">
+				<a class="navbar-brand" href="{{ url_for('user.dashboard') }}">
+					<div style="display: flex;">
+						<img
+							src="{{ url_for('static', filename='images/logo2.png') }}"
+							alt="logo"
+							width="60"
+							height="48"
+							class="d-inline-block align-text-top"
+						/>
+						<h3 style="padding-left: 10px;">
+							SW Verification & Validation
+						</h3>
+					</div>
+				</a>
+				{% if current_user.firstname %}
+				<div>	
+					<h4>
+						Welcome {{ current_user.firstname }} {{ current_user.lastname }}
+					</h4>
+				</div>
+				{% endif %}
+				<div class="button-div">
+					<form action="{{ url_for('user.dashboard') }}" method="get">
+						<button class="btn btn-dark">Profile</button>
+					</form>
+					<form action="{{ url_for('auth.logout') }}" method="get">
+						<button class="btn btn-danger">Logout</button>
+					</form>
+				</div>
+			</div>
+		</nav>
+		<div class="error-div">
+			{% with errors = get_flashed_messages(category_filter=["error"]) %} {% if
+			errors %}
+			<div class="alert alert-danger alert-dismissible fade show" role="alert">
+				<ul>
+					{%- for msg in errors %}
+					<li>{{ msg }}</li>
+					{% endfor -%}
+				</ul>
+	
+				<button
+					type="button"
+					class="btn-close"
+					data-bs-dismiss="alert"
+					aria-label="Close"
+				></button>
+			</div>
+			{% endif %} {% endwith %} {% with messages =
+			get_flashed_messages(category_filter=["success"]) %} {% if messages %}
+			<div class="alert alert-success alert-dismissible fade show" role="alert">
+				<ul>
+					{%- for msg in messages %}
+					<li>{{ msg }}</li>
+					{% endfor -%}
+				</ul>
+	
+				<button
+					type="button"
+					class="btn-close"
+					data-bs-dismiss="alert"
+					aria-label="Close"
+				></button>
+			</div>
+			{% endif %} {% endwith %}
+		</div>
+		<div class="container">{% block main %} {% endblock %}</div>
+		<script>
+			var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+			var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+			  return new bootstrap.Popover(popoverTriggerEl)
+			})
+		</script>
+	</body>
+</html>
