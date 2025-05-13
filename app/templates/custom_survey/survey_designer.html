@@ -112,7 +112,7 @@
                 question.options = optionsInput.value.split(',').map(opt => opt.trim()).filter(opt => opt);
             }
 
-            if (condQid && condVal) {
+            if (condQid || condVal) {
                 question.conditional = {
                     show_if: {
                         question_id: condQid,

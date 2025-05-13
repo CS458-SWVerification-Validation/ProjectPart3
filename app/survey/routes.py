@@ -43,7 +43,7 @@ def submit_survey(user_id):
         return jsonify({'message': 'User does not exist'}), 200
     
 
-AI_MODELS = ["ChatGPT", "Bard", "Claude", "Copilot"]
+AI_MODELS = ["ChatGPT", "Bard", "Claude", "Copilot", "None"]
 
 @bp.route("/form", methods=["GET", "POST"])
 def form():
@@ -57,7 +57,11 @@ def form():
         city            = form.get("city",         "")
         gender          = form.get("gender",       "")
         useCase         = form.get("useCase",      "")
-
+        defects = {
+            k.split("_", 1)[1]: v
+            for k, v in form.items() if k.startswith("defect_")
+        }
+        
         errors = []
         if not name:
             errors.append("Name is required.")
@@ -78,13 +82,21 @@ def form():
             errors.append("City is required.")
         if not gender:
             errors.append("Gender is required.")
+        if not defects:
+            errors.append("At least ONE option must be selected on AI section.")
+        if 'None' in defects:
+            if ('ChatGPT' in defects) or ('Bard' in defects) or ('Claude' in defects) or ('Copilot' in defects):
+                errors.append("If None selected, no other option can be selected.")
+        else:
+            if (('ChatGPT' in defects) and defects['ChatGPT'] == "") or (('Bard' in defects) and defects['Bard'] == "") or (('Claude' in defects) and defects['Claude'] == "") or (('Copilot' in defects) and defects['Copilot'] == ""):
+                errors.append("Selected models' defect is required.")
 
         # EARLY RETURN ON ANY VALIDATION ERROR
         if errors:
             for e in errors:
-                flash(e, "danger")
+                flash(e, "error")
             return render_template(
-                "ready_survey.html",
+                "ready_survey/ready_survey.html",
                 ai_models=AI_MODELS,
                 selected=form.getlist("ai_models"),
                 values=form
@@ -101,10 +113,7 @@ def form():
                 "educationLevel": educationLevel,
                 "city": city,
                 "gender": gender,
-                "defects": {
-                    k.split("_", 1)[1]: v
-                    for k, v in form.items() if k.startswith("defect_")
-                },
+                "defects": defects,
                 "useCase": useCase,
             }
             if user.email:
@@ -114,7 +123,7 @@ def form():
             flash("Survey submitted – thank you!", "success")
             return redirect(url_for("user.dashboard"))
         else:
-            flash("Server error!", "danger")
+            flash("Server error!", "error")
             return render_template(
                 "ready_survey.html",
                 ai_models=AI_MODELS,
