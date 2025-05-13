@@ -1,5 +1,4 @@
 from app import create_app
-from app.ready_survey import ready_survey_bp
 
 
 app = create_app()
