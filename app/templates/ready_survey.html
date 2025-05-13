@@ -1,0 +1,152 @@
+{% extends "innerbase.html" %}
+{% block main %}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="mt-3">
+      {% for category, msg in messages %}
+        <div class="alert alert-{{ category }}">{{ msg }}</div>
+      {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+/>
+
+<h1 class="mb-4">Survey</h1>
+<form method="post" class="needs-validation" novalidate>
+  <div class="row g-3">
+    <!-- NAME / SURNAME -->
+    <div class="col-md-6">
+      <label class="form-label">Name</label>
+      <input name="name" value="{{ values.get('name','') }}"
+             class="form-control" required />
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Surname</label>
+      <input name="surname" value="{{ values.get('surname','') }}"
+             class="form-control" required />
+    </div>
+
+    <!-- BIRTH DATE -->
+    <div class="col-md-6 col-lg-4">
+        <label class="form-label">Birth&nbsp;Date (YYYY-MM-DD)</label>
+        <input type="text" name="birthDate"
+               value="{{ values.get('birthDate','') }}"
+               class="form-control"
+               placeholder="e.g. 2000-01-01"
+               pattern="\d{4}-\d{2}-\d{2}"
+               required />
+        <div class="invalid-feedback">
+          Please enter a date in YYYY-MM-DD format.
+        </div>
+    </div>
+
+    <!-- EDUCATION -->
+    <div class="col-md-6 col-lg-4">
+      <label class="form-label">Education&nbsp;Level</label>
+      <select name="educationLevel" class="form-select" required>
+        <option value="">Choose…</option>
+        <option value="high_school"
+                {{ "selected" if values.get('educationLevel')=="high_school" else "" }}>
+          High School
+        </option>
+        <option value="bachelor"
+                {{ "selected" if values.get('educationLevel')=="bachelor" else "" }}>
+          Bachelor’s
+        </option>
+        <option value="master"
+                {{ "selected" if values.get('educationLevel')=="master" else "" }}>
+          Master’s
+        </option>
+        <option value="phd"
+                {{ "selected" if values.get('educationLevel')=="phd" else "" }}>
+          PhD
+        </option>
+      </select>
+    </div>
+
+    <!-- CITY -->
+    <div class="col-md-6 col-lg-4">
+      <label class="form-label">City</label>
+      <input name="city" value="{{ values.get('city','') }}"
+             class="form-control" required />
+    </div>
+
+    <!-- GENDER -->
+    <div class="col-md-6 col-lg-4">
+      <label class="form-label">Gender</label>
+      <select name="gender" class="form-select" required>
+        <option value="">Choose…</option>
+        {% for g in ["male","female","other"] %}
+        <option value="{{ g }}"
+            {{ "selected" if values.get('gender')==g else "" }}>
+          {{ g|capitalize }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <hr class="my-4" />
+
+  <!-- AI MODELS -->
+  <p class="fw-semibold">AI Models You Have Tried</p>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-2">
+    {% for m in ai_models %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox"
+             name="ai_models" value="{{ m }}"
+             id="chk{{ m }}"
+             {% if m in selected %}checked{% endif %} />
+      <label class="form-check-label" for="chk{{ m }}">{{ m }}</label>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- DEFECTS PER SELECTED MODEL -->
+  <div id="defects-box" class="mt-3">
+    {% for m in selected %}
+    <div class="mb-3">
+      <label class="form-label">Any defects or cons of {{ m }}?</label>
+      <textarea class="form-control"
+                name="defect_{{ m }}"
+                rows="2">{{ values.get('defects', {}).get(m,'') }}</textarea>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- USE-CASE -->
+  <div class="mb-4">
+    <label class="form-label">Any AI use-case beneficial in daily life</label>
+    <textarea class="form-control" rows="3" name="useCase">
+      {{ values.get('useCase','') }}
+    </textarea>
+  </div>
+
+  <!-- SUBMIT -->
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<!-- light JS snippet to show defect boxes dynamically -->
+<script>
+  document.querySelectorAll('input[name="ai_models"]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      if (cb.checked) {
+        const div = document.createElement("div");
+        div.className = "mb-3";
+        div.innerHTML =
+          `<label class="form-label">Any defects or cons of ${cb.value}?</label>
+           <textarea class="form-control" rows="2"
+                     name="defect_${cb.value}"></textarea>`;
+        document.getElementById("defects-box").appendChild(div);
+      } else {
+        document.querySelectorAll(
+          `textarea[name="defect_${cb.value}"]`
+        ).forEach(t => t.closest('.mb-3').remove());
+      }
+    });
+  });
+</script>
+{% endblock %}

@@ -4,6 +4,7 @@ from flask_login import LoginManager, login_user
 from flask_cors import CORS
 from oauthlib.oauth2 import WebApplicationClient
 
+from config import config
 import os
 import json
 import requests
@@ -19,10 +20,20 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 def create_app(config_mode='development'):
     app = Flask(__name__)
+    app.config.from_object(config[config_mode])  # config["testing"] is now valid
+
+        # only bind SQLAlchemy if it isn't already bound
+    if "sqlalchemy" not in app.extensions:
+        db.init_app(app)
+
+
+    # Register blueprints, etc.
+    from .ready_survey import ready_survey_bp
+    app.register_blueprint(ready_survey_bp)
     CORS(app, supports_credentials=True, origins="*")
     app.config.from_object(config[config_mode])
 
-    db.init_app(app)
+    
     Migrate(app, db)
 
     login_manager = LoginManager()
