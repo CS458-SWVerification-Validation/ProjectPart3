@@ -1,6 +1,8 @@
 # ProjectPart3
 
 This is the Flask App for CS458 Project.
+> [!NOTE]
+> The app is served on [https://validsoftware458.com.tr:8443/](https://validsoftware458.com.tr:8443/)
 
 # Getting Started
 
