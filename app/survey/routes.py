@@ -82,14 +82,28 @@ def form():
             errors.append("City is required.")
         if not gender:
             errors.append("Gender is required.")
-        if not defects:
+        selected_models = form.getlist("ai_models")                       # ← NEW
+
+        # text entered for each model (unchanged)
+        defects = {                                                      # ← MOVED
+            k.split("_", 1)[1]: v
+            for k, v in form.items() if k.startswith("defect_")
+        }
+
+        # 1) at least one model selected
+        if not selected_models:                                          # ← NEW
             errors.append("At least ONE option must be selected on AI section.")
-        if 'None' in defects:
-            if ('ChatGPT' in defects) or ('Bard' in defects) or ('Claude' in defects) or ('Copilot' in defects):
-                errors.append("If None selected, no other option can be selected.")
-        else:
-            if (('ChatGPT' in defects) and defects['ChatGPT'] == "") or (('Bard' in defects) and defects['Bard'] == "") or (('Claude' in defects) and defects['Claude'] == "") or (('Copilot' in defects) and defects['Copilot'] == ""):
-                errors.append("Selected models' defect is required.")
+
+        # 2) “None” may NOT appear with any other model
+        if "None" in selected_models and len(selected_models) > 1:       # ← NEW
+            errors.append("If None selected, no other option can be selected.")
+
+        # 3) for each real model chosen, a defect text is required
+        if "None" not in selected_models:                                # ← NEW
+            for m in selected_models:
+                if m in ["ChatGPT", "Bard", "Claude", "Copilot"]:
+                    if m not in defects or not defects[m].strip():
+                        errors.append("Selected models' defect is required.")
 
         # EARLY RETURN ON ANY VALIDATION ERROR
         if errors:
