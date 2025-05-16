@@ -60,10 +60,10 @@ def survey_designer():
                     flash("Condition value is required.", "error")
                     return render_template('custom_survey/survey_designer.html')
                 
-                print(q['conditional']['show_if']['question_id'])
                 if int(q['conditional']['show_if']['question_id'][1:]) + 1 > no_question or int(q['conditional']['show_if']['question_id'][1:]) + 1 <= 0:
                     flash("Conditioned question does not exist.", "error")
                     return render_template('custom_survey/survey_designer.html')
+                
                 cond = ConditionalLogic(
                     question=question,
                     show_if_question_id=q['conditional']['show_if']['question_id'],
@@ -72,6 +72,7 @@ def survey_designer():
                 db.session.add(cond)
 
         db.session.commit()
+        flash("Survey successfully created.", "success")
         return redirect(url_for('user.dashboard'))
     
     return render_template('custom_survey/survey_designer.html')
